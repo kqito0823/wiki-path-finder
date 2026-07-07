@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import InputForm from "@/components/input";
+import { start } from "repl";
 
 type InputData = {
   start: string;
@@ -25,9 +26,6 @@ export default function Home() {
     console.log(path);
     setPath(path.path);
   };
-
-  useEffect(async () => {}, []);
-
   return (
     <>
       <div className="h-dvh flex justify-center bg-[#eef1e4] bg-[repeating-linear-gradient(135deg,#eef1e4_0px,#eef1e4_28px,#e4e9d9_28px,#e4e9d9_56px)] px-5 py-12 text-[#1f2430]">
