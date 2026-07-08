@@ -9,13 +9,8 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
-password = os.getenv("DB_PASSWORD")
-conn = psycopg2.connect(
-    host="localhost",
-    database="mygraph",
-    user="postgres",
-    password=password,
-)
+DATABASE_URL = os.getenv("DATABASE_URL")
+conn = psycopg2.connect(DATABASE_URL, sslmode="require")
 cur = conn.cursor()
 
 app = FastAPI()
