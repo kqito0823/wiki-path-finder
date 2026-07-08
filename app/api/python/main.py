@@ -22,7 +22,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://wiki-path-finder-one.vercel.app"],
+    allow_origins=["http://localhost:3000", "https://wiki-path-finder-one.vercel.app"],
     allow_methods=["GET"],
 )
 
