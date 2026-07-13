@@ -7,14 +7,10 @@ import psycopg2
 from dotenv import load_dotenv
 import os
 
+
 load_dotenv()
-password = os.getenv("DB_PASSWORD")
-conn = psycopg2.connect(
-    host="localhost",
-    database="mygraph",
-    user="postgres",
-    password=password,
-)
+DATABASE_URL = os.getenv("DATABASE_URL")
+conn = psycopg2.connect(DATABASE_URL)
 cur = conn.cursor()
 
 # node DBをいったん削除

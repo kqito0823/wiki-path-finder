@@ -16,7 +16,7 @@ export async function GET(request: Request) {
   try {
     const res = await fetch(
       `https://ja.wikipedia.org/wiki/${encodeURIComponent(fNode.replace(/_/g, ' '))}`,
-      { method: "GET" }
+      { method: "GET" ,headers: { "User-Agent": process.env.USER_AGENT ?? "wiki-path-finder/1.0" }}
     );
 
     if (!res.ok) {
@@ -30,7 +30,6 @@ export async function GET(request: Request) {
     const $ = cheerio.load(html);
 
     const target = $(`a[title="${node.replace(/_/g, ' ')}"]`).first();
-    console.log(target.text())
     return NextResponse.json({text:target.text() ? target.text() : node});
   } catch (err) {
     return NextResponse.json(

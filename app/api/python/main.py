@@ -52,7 +52,6 @@ def search_db(name: str, sg: str):
     # 近似一致が何もなければ削除
     if not result:
         return {"error": "No result"}
-    print(result, flush=True)
     # 一見ずつ確認
     return [
         {"node_id": row[0], "name": row[1], "is_redirect": row[2], "is_orphan": row[3]}
@@ -96,13 +95,11 @@ def get_path(s: str, g: str):
 
     # ユーザー入力が存在しない場合は、エラー
     if not start or not gresult:
-        print("記事が存在しません")
         return {"error": "Node not found"}
 
     # orphan(誰からもリンクされていない孤立記事)である場合は、エラー
     goal, is_orphan = gresult
     if is_orphan:
-        print("ゴールにたどり着けません")
         return {"error": "Goal node is Orphan"}
 
     path = finder(start[0], goal)

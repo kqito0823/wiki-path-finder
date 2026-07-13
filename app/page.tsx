@@ -2,8 +2,7 @@
 import { useState, useEffect } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import InputForm from "@/components/input";
-import { Span } from "next/dist/trace";
-import { spawn } from "child_process";
+import ColumnPage from "@/components/column";
 
 type InputData = {
   start: string;
@@ -17,33 +16,49 @@ type Path = {
 
 type PathResponse = {
   path: string[];
+  error: string;
 };
 
 export default function Home() {
   const [path, setPath] = useState<Path[]>([]);
+  const [error, setError] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isColumn, setIsColumn] = useState<boolean>(false);
   const methods = useForm({
     defaultValues: { start: "", goal: "" },
   });
 
+  const ERROR_MESSAGES: Record<string, string> = {
+    "Node not found": "入力されたノードが存在しません",
+    "Goal node is Orphan": "このゴールノードには絶対にたどり着けません",
+    "path not exist": "最短経路が長くなりすぎるため強制終了しました",
+    "Could not connect to the server": "サーバー側に接続できませんでした",
+  };
+
   const onSubmit = async (data: InputData) => {
     const start = data.start;
     const goal = data.goal;
-    console.log(start, goal);
-    const resJson = await fetch(
-      `api/finder?start=${encodeURIComponent(start)}&goal=${encodeURIComponent(goal)}`,
-    );
-    const res: PathResponse = await resJson.json();
-    console.log(res);
-    setPath(res.path.map((r) => ({ name: r, displayName: "" })));
-  };
-
-  type Path = {
-    name: string;
-    displayName: string;
+    try {
+      const resJson = await fetch(
+        `api/finder?start=${encodeURIComponent(start)}&goal=${encodeURIComponent(goal)}`,
+      );
+      const res: PathResponse = await resJson.json();
+      setIsLoading(false);
+      if (res.error) {
+        setError(res.error);
+      } else {
+        setPath(res.path.map((r) => ({ name: r, displayName: "" })));
+        if (error) setError("");
+      }
+    } catch (e) {
+      console.error(e);
+      setError("Could not connect to the server");
+    }
   };
 
   useEffect(() => {
     if (path.length === 0) return;
+    if (error) return;
 
     const needsFetch = path.some((item, i) => i > 0 && item.displayName === "");
     if (!needsFetch) return;
@@ -66,7 +81,6 @@ export default function Home() {
             continue;
           }
           const data = await res.json();
-          console.log(data.text);
           updated[i] = {
             ...updated[i],
             displayName: data.text ? data.text : updated[i].name,
@@ -90,211 +104,69 @@ export default function Home() {
 
   return (
     <>
-      <div className="h-dvh flex justify-center bg-[#eef1e4] bg-[repeating-linear-gradient(135deg,#eef1e4_0px,#eef1e4_28px,#e4e9d9_28px,#e4e9d9_56px)] px-5 py-12 text-[#1f2430]">
-        <div className="flex flex-col gap-20">
-          <div className="w-full h-full max-w-120  rounded-2xl border border-[#d9d2b8] bg-[#fbf8f0] shadow-[0_8px_24px_rgba(31,36,48,0.10)]">
-            {/* ヘッダー：スコアカードのタイトル帯 */}
-            <div className="bg-[#1f4d36] px-9 pb-5 pt-6">
-              <p className="mb-1 text-[11px] font-semibold tracking-[0.28em] text-[#9fc6ab]">
-                ROUTE FINDER
-              </p>
-              <h1 className="text-2xl font-bold text-white">経路を探す</h1>
-            </div>
-
-            <div className="px-9 pb-8 pt-7">
-              <FormProvider {...methods}>
-                <form
-                  onSubmit={methods.handleSubmit(onSubmit)}
-                  className="flex flex-col gap-7"
-                >
-                  <div className="relative flex items-start gap-6 pt-2.75">
-                    {/* フェアウェイのトレイル（水平） */}
-                    <svg
-                      className="  pointer-events-none absolute inset-x-0 top-[11px] h-px w-full"
-                      aria-hidden="true"
-                    >
-                      <line
-                        x1="0"
-                        y1="0.5"
-                        x2="100%"
-                        y2="0.5"
-                        stroke="#c9c2a6"
-                        strokeWidth="2"
-                        strokeDasharray="3 7"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-
-                    {/* スタート：ティーマーカー */}
-                    <div className="mt-5 relative min-w-0 flex-1">
-                      <div className="mb-3 flex flex-col items-center gap-2 text-center">
-                        <span className="flex h-[22px] w-[22px] items-center justify-center rounded-full border-2 border-[#1f4d36] bg-[#fbf8f0] text-[#1f4d36]">
-                          <svg
-                            viewBox="0 0 24 24"
-                            width="10"
-                            height="10"
-                            fill="currentColor"
-                          >
-                            <circle cx="12" cy="12" r="9" />
-                          </svg>
-                        </span>
-                        <p className="text-[13px] tracking-[0.12em] text-[#8a8672]">
-                          スタート
-                        </p>
-                      </div>
-                      <InputForm SG="start" />
-                    </div>
-
-                    {/* ゴール：フラッグ */}
-                    <div className="mt-5 relative min-w-0 flex-1">
-                      <div className="mb-3 flex flex-col items-center gap-2 text-center">
-                        <span className="flex h-[22px] w-[22px] items-center justify-center rounded-full border-2 border-[#c0392b] bg-[#fbf8f0] text-[#c0392b]">
-                          <svg
-                            viewBox="0 0 24 24"
-                            width="13"
-                            height="13"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1.8"
-                            strokeLinejoin="round"
-                            strokeLinecap="round"
-                          >
-                            <path d="M4 2v20M4 3h15l-3.2 4L19 11H4" />
-                          </svg>
-                        </span>
-                        <p className="text-[13px] tracking-[0.12em] text-[#8a8672]">
-                          ゴール
-                        </p>
-                      </div>
-                      <InputForm SG="goal" />
-                    </div>
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="ml-[30px] inline-flex w-fit items-center gap-2 rounded-full bg-[#1f2430] px-6.5 py-2.5 text-sm font-bold text-white transition hover:-translate-y-px hover:bg-[#1f4d36] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1f4d36]"
-                  >
-                    経路を探す
-                    <svg
-                      viewBox="0 0 24 24"
-                      width="14"
-                      height="14"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M5 12h14M13 6l6 6-6 6" />
-                    </svg>
-                  </button>
-                </form>
-              </FormProvider>
-            </div>
+      <header>
+        <h1>Wiki-Path-Finder</h1>
+        <label>
+          おまけコラムを見る
+          <input
+            type="checkbox"
+            checked={isColumn ?? false}
+            onChange={() => {
+              setIsColumn((prev) => !prev);
+            }}
+          />
+        </label>
+      </header>
+      {!isColumn ? (
+        <main>
+          <div id="description">
+            <p>
+              このサイトは、バキ童氏のYouTubeチャンネルにて行われていた企画「Wikipediaゴルフ」の最短経路を出してくれます。
+            </p>
+            <p>
+              スタート記事とゴール記事を入力すると、Wikipedia内のリンク構造を探索し、最短経路を表示します。
+            </p>
+            <p>
+              Wikipediaゴルフの攻略や、記事同士の意外なつながりを見つけるのにご活用ください。
+            </p>
+            <p>※検索対象は日本語版Wikipediaです。</p>
+            <p>※DBを無料枠に収めるために、ある程度削減しています。</p>
           </div>
-
-          {/* 結果：スコアカード風の丸囲みスコア */}
-          {path.length !== 0 && (
-            <div className="mx-auto mt-6 w-full max-w-120 rounded-2xl border border-[#d9d2b8] bg-[#fbf8f0] shadow-[0_8px_24px_rgba(31,36,48,0.10)]">
-              {/* ヘッダー帯（フォームと統一感を出す） */}
-              <div className="flex items-center justify-between bg-[#1f4d36] px-7 py-4">
-                <p className="text-[11px] font-semibold tracking-[0.28em] text-[#9fc6ab]">
-                  RESULT
-                </p>
-                <p className="text-[11px] tracking-[0.2em] text-[#9fc6ab]">
-                  {path.length} POINTS
-                </p>
-              </div>
-
-              <div className="px-7 py-6">
-                {/* フェアウェイ：経由地を繋ぐ点線ルート */}
-                <div className="relative flex flex-col gap-5">
-                  <svg
-                    className="pointer-events-none absolute left-[13px] top-2 bottom-2 w-px"
-                    aria-hidden="true"
-                  >
-                    <line
-                      x1="0.5"
-                      y1="0"
-                      x2="0.5"
-                      y2="100%"
-                      stroke="#c9c2a6"
-                      strokeWidth="2"
-                      strokeDasharray="3 7"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-
-                  {path.map((p, i) => {
-                    const isStart = i === 0;
-                    const isGoal = i === path.length - 1;
-                    return (
-                      <div key={i} className="relative flex items-center gap-4">
-                        {/* マーカー：スタート=丸、ゴール=フラッグ、中間=番号 */}
-                        <span
-                          className={`z-10 flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full border-2 bg-[#fbf8f0] text-[11px] font-bold ${
-                            isStart
-                              ? "border-[#1f4d36] text-[#1f4d36]"
-                              : isGoal
-                                ? "border-[#c0392b] text-[#c0392b]"
-                                : "border-[#c9c2a6] text-[#8a8672]"
-                          }`}
-                        >
-                          {isStart ? (
-                            <svg
-                              viewBox="0 0 24 24"
-                              width="9"
-                              height="9"
-                              fill="currentColor"
-                            >
-                              <circle cx="12" cy="12" r="9" />
-                            </svg>
-                          ) : isGoal ? (
-                            <svg
-                              viewBox="0 0 24 24"
-                              width="12"
-                              height="12"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="1.8"
-                              strokeLinejoin="round"
-                              strokeLinecap="round"
-                            >
-                              <path d="M4 2v20M4 3h15l-3.2 4L19 11H4" />
-                            </svg>
-                          ) : (
-                            i
-                          )}
-                        </span>
-
-                        {/* 地点名カード */}
-                        <div className="flex min-w-0 flex-1 items-baseline justify-between gap-3 rounded-xl border border-[#d9d2b8] bg-white px-4 py-2.5">
-                          <span className="truncate text-sm font-medium text-[#1f2430]">
-                            {p.name}
-                          </span>
-                          {p.displayName && (
-                            <span className="shrink-0 text-xs text-[#8a8672]">
-                              {p.displayName}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
+          <div id="inputForm">
+            <FormProvider {...methods}>
+              <form onSubmit={methods.handleSubmit(onSubmit)}>
+                <p>スタート</p>
+                <InputForm SG="start" />
+                <p>ゴール</p>
+                <InputForm SG="goal" />
+                <button type="submit" onClick={() => setIsLoading(true)}>
+                  経路を探す
+                </button>
+              </form>
+            </FormProvider>
+          </div>
+          <div id="Loading">{isLoading && <p>検索中...</p>}</div>
+          <div id="result">
+            {error ? (
+              <p>{ERROR_MESSAGES[error] ?? "予期せぬエラーが発生しました"}</p>
+            ) : (
+              path.length !== 0 && (
+                <div>
+                  {path.map((p, i) => (
+                    <div key={i}>
+                      <span>{p.name}</span>
+                      {p.displayName && <span>{p.displayName}</span>}
+                    </div>
+                  ))}
+                  <span>{path.length - 1}打で到達</span>
                 </div>
-
-                {/* トータルスコア */}
-                <div className="mt-6 flex items-center gap-3 border-t border-dashed border-[#d9d2b8] pt-5">
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 border-[#1f4d36] text-lg font-bold text-[#1f4d36]">
-                    {path.length - 1}
-                  </span>
-                  <span className="text-sm text-[#6b7280]">打で到達</span>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+              )
+            )}
+          </div>
+        </main>
+      ) : (
+        <ColumnPage />
+      )}
     </>
   );
 }
