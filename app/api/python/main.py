@@ -10,7 +10,7 @@ import os
 
 load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL")
-conn = psycopg2.connect(DATABASE_URL)
+conn = psycopg2.connect(DATABASE_URL, sslmode="require")
 cur = conn.cursor()
 
 app = FastAPI()
