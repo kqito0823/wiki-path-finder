@@ -2,15 +2,25 @@
 import { useState, useEffect } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import InputForm from "@/components/input";
-import { start } from "repl";
+import { Span } from "next/dist/trace";
+import { spawn } from "child_process";
 
 type InputData = {
   start: string;
   goal: string;
 };
 
+type Path = {
+  name: string;
+  displayName: string;
+};
+
+type PathResponse = {
+  path: string[];
+};
+
 export default function Home() {
-  const [path, setPath] = useState<string[]>([]);
+  const [path, setPath] = useState<Path[]>([]);
   const methods = useForm({
     defaultValues: { start: "", goal: "" },
   });
@@ -19,18 +29,70 @@ export default function Home() {
     const start = data.start;
     const goal = data.goal;
     console.log(start, goal);
-    const res = await fetch(
+    const resJson = await fetch(
       `api/finder?start=${encodeURIComponent(start)}&goal=${encodeURIComponent(goal)}`,
     );
-    const path = await res.json();
-    console.log(path);
-    setPath(path.path);
+    const res: PathResponse = await resJson.json();
+    console.log(res);
+    setPath(res.path.map((r) => ({ name: r, displayName: "" })));
   };
+
+  type Path = {
+    name: string;
+    displayName: string;
+  };
+
+  useEffect(() => {
+    if (path.length === 0) return;
+
+    const needsFetch = path.some((item, i) => i > 0 && item.displayName === "");
+    if (!needsFetch) return;
+
+    let cancelled = false;
+
+    const getDisplayPath = async () => {
+      const updated: Path[] = [...path];
+
+      for (let i = 1; i < updated.length; i++) {
+        if (updated[i].displayName !== "") continue;
+
+        try {
+          const res = await fetch(
+            `/api/get_display_name?node=${encodeURIComponent(updated[i].name)}&foreNode=${encodeURIComponent(updated[i - 1].name)}`,
+          );
+          if (!res.ok) {
+            console.error(`fetch failed: ${res.status}`);
+            updated[i] = { ...updated[i], displayName: updated[i].name };
+            continue;
+          }
+          const data = await res.json();
+          console.log(data.text);
+          updated[i] = {
+            ...updated[i],
+            displayName: data.text ? data.text : updated[i].name,
+          };
+        } catch (e) {
+          console.error(e);
+          updated[i] = { ...updated[i], displayName: updated[i].name };
+        }
+      }
+
+      if (!cancelled) {
+        setPath(updated);
+      }
+    };
+
+    getDisplayPath();
+    return () => {
+      cancelled = true;
+    };
+  }, [path]);
+
   return (
     <>
       <div className="h-dvh flex justify-center bg-[#eef1e4] bg-[repeating-linear-gradient(135deg,#eef1e4_0px,#eef1e4_28px,#e4e9d9_28px,#e4e9d9_56px)] px-5 py-12 text-[#1f2430]">
         <div className="flex flex-col gap-20">
-          <div className="w-full max-w-120 overflow-hidden rounded-2xl border border-[#d9d2b8] bg-[#fbf8f0] shadow-[0_8px_24px_rgba(31,36,48,0.10)]">
+          <div className="w-full h-full max-w-120  rounded-2xl border border-[#d9d2b8] bg-[#fbf8f0] shadow-[0_8px_24px_rgba(31,36,48,0.10)]">
             {/* ヘッダー：スコアカードのタイトル帯 */}
             <div className="bg-[#1f4d36] px-9 pb-5 pt-6">
               <p className="mb-1 text-[11px] font-semibold tracking-[0.28em] text-[#9fc6ab]">
@@ -133,27 +195,101 @@ export default function Home() {
 
           {/* 結果：スコアカード風の丸囲みスコア */}
           {path.length !== 0 && (
-            <div className="mx-auto mt-6 w-full rounded-2xl border border-[#d9d2b8] bg-[#fbf8f0] px-7 py-6 shadow-[0_8px_24px_rgba(31,36,48,0.10)]">
-              <p className="mb-4 text-[11px] font-semibold tracking-[0.28em] text-[#8a8672]">
-                RESULT
-              </p>
-
-              <div className="flex flex-wrap items-center gap-x-2 gap-y-3">
-                {path.map((p, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    {i !== 0 && <span className="text-[#c9c2a6]">···</span>}
-                    <span className="rounded-full border border-[#d9d2b8] bg-white px-3.5 py-1.5 text-sm font-medium text-[#1f2430]">
-                      {p}
-                    </span>
-                  </div>
-                ))}
+            <div className="mx-auto mt-6 w-full max-w-120 rounded-2xl border border-[#d9d2b8] bg-[#fbf8f0] shadow-[0_8px_24px_rgba(31,36,48,0.10)]">
+              {/* ヘッダー帯（フォームと統一感を出す） */}
+              <div className="flex items-center justify-between bg-[#1f4d36] px-7 py-4">
+                <p className="text-[11px] font-semibold tracking-[0.28em] text-[#9fc6ab]">
+                  RESULT
+                </p>
+                <p className="text-[11px] tracking-[0.2em] text-[#9fc6ab]">
+                  {path.length} POINTS
+                </p>
               </div>
 
-              <div className="mt-6 flex items-center gap-3 border-t border-dashed border-[#d9d2b8] pt-5">
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 border-[#1f4d36] text-lg font-bold text-[#1f4d36]">
-                  {path.length - 1}
-                </span>
-                <span className="text-sm text-[#6b7280]">打で到達</span>
+              <div className="px-7 py-6">
+                {/* フェアウェイ：経由地を繋ぐ点線ルート */}
+                <div className="relative flex flex-col gap-5">
+                  <svg
+                    className="pointer-events-none absolute left-[13px] top-2 bottom-2 w-px"
+                    aria-hidden="true"
+                  >
+                    <line
+                      x1="0.5"
+                      y1="0"
+                      x2="0.5"
+                      y2="100%"
+                      stroke="#c9c2a6"
+                      strokeWidth="2"
+                      strokeDasharray="3 7"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+
+                  {path.map((p, i) => {
+                    const isStart = i === 0;
+                    const isGoal = i === path.length - 1;
+                    return (
+                      <div key={i} className="relative flex items-center gap-4">
+                        {/* マーカー：スタート=丸、ゴール=フラッグ、中間=番号 */}
+                        <span
+                          className={`z-10 flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full border-2 bg-[#fbf8f0] text-[11px] font-bold ${
+                            isStart
+                              ? "border-[#1f4d36] text-[#1f4d36]"
+                              : isGoal
+                                ? "border-[#c0392b] text-[#c0392b]"
+                                : "border-[#c9c2a6] text-[#8a8672]"
+                          }`}
+                        >
+                          {isStart ? (
+                            <svg
+                              viewBox="0 0 24 24"
+                              width="9"
+                              height="9"
+                              fill="currentColor"
+                            >
+                              <circle cx="12" cy="12" r="9" />
+                            </svg>
+                          ) : isGoal ? (
+                            <svg
+                              viewBox="0 0 24 24"
+                              width="12"
+                              height="12"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="1.8"
+                              strokeLinejoin="round"
+                              strokeLinecap="round"
+                            >
+                              <path d="M4 2v20M4 3h15l-3.2 4L19 11H4" />
+                            </svg>
+                          ) : (
+                            i
+                          )}
+                        </span>
+
+                        {/* 地点名カード */}
+                        <div className="flex min-w-0 flex-1 items-baseline justify-between gap-3 rounded-xl border border-[#d9d2b8] bg-white px-4 py-2.5">
+                          <span className="truncate text-sm font-medium text-[#1f2430]">
+                            {p.name}
+                          </span>
+                          {p.displayName && (
+                            <span className="shrink-0 text-xs text-[#8a8672]">
+                              {p.displayName}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* トータルスコア */}
+                <div className="mt-6 flex items-center gap-3 border-t border-dashed border-[#d9d2b8] pt-5">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 border-[#1f4d36] text-lg font-bold text-[#1f4d36]">
+                    {path.length - 1}
+                  </span>
+                  <span className="text-sm text-[#6b7280]">打で到達</span>
+                </div>
               </div>
             </div>
           )}
