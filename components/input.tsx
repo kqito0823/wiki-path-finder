@@ -51,36 +51,47 @@ export default function InputForm({ SG }: { SG: string }) {
     setSearchResult([]);
   };
   return (
-    <div className="relative w-full group">
+    <div className="relative">
       {/* 入力フィールド */}
-      <input
-        type="text"
-        {...rhfField}
-        value={inputValue}
-        onChange={(e) => handleChange(e, SG)}
-        placeholder="Wikipediaの記事名を入力..."
-        autoComplete="off"
-        className="w-full px-6 py-4 bg-white border-0 ring-1 ring-slate-200/80 rounded-2xl text-slate-800 text-lg font-bold placeholder:text-slate-300 placeholder:font-medium shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:shadow-[0_0_20px_rgba(99,102,241,0.15)] transition-all duration-300"
-      />
+      <div className="flex items-center gap-2 rounded-lg border border-[#B9AE86] bg-white/70 px-3.5 py-2.5 transition focus-within:border-[#1F3A2E] focus-within:bg-white focus-within:ring-2 focus-within:ring-[#1F3A2E]/15">
+        <svg
+          aria-hidden
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="h-4 w-4 shrink-0 text-[#7C6A3F]"
+        >
+          <circle cx="11" cy="11" r="7" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <input
+          type="text"
+          {...rhfField}
+          value={inputValue}
+          onChange={(e) => handleChange(e, SG)}
+          autoComplete="off"
+          placeholder="記事名を入力..."
+          className="w-full bg-transparent text-sm text-[#1F3A2E] placeholder:text-[#A99B6E] focus:outline-none"
+        />
+      </div>
 
       {/* 検索サジェスト (絶対配置・フローティングメニュー風) */}
       {searchResult.length > 0 && (
-        <ul className="absolute z-50 w-full mt-3 bg-white/95 backdrop-blur-xl border border-slate-100/80 rounded-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] max-h-[280px] overflow-y-auto divide-y divide-slate-50 animate-in fade-in slide-in-from-top-2 duration-200">
+        <ul className="absolute left-0 right-0 top-[calc(100%+6px)] z-20 max-h-64 overflow-auto rounded-xl border border-[#B9AE86] bg-[#F3EEDD] py-1.5 shadow-[0_16px_40px_-12px_rgba(0,0,0,0.45)]">
           {searchResult.map((sr, i) => (
             <li
               key={i}
               onClick={() => {
                 handleConfirm(sr.node_id, sr.name, sr.is_redirect);
               }}
-              className="cursor-pointer px-6 py-4 hover:bg-indigo-50/50 transition-colors flex items-center justify-between"
+              className="flex cursor-pointer items-center justify-between gap-2 px-4 py-2 text-sm text-[#1F3A2E] transition hover:bg-[#E7DFC2]"
             >
-              <p className="text-slate-700 font-bold group-hover:text-indigo-700 truncate pr-4 transition-colors">
-                {sr.name}
-              </p>
-
-              {/* リダイレクトのバッジ */}
+              <span className="truncate">{sr.name}</span>
               {sr.is_redirect && (
-                <span className="shrink-0 text-[10px] font-black tracking-wider bg-slate-100 text-slate-400 px-2.5 py-1 rounded-full border border-slate-200/60">
+                <span className="-rotate-3 shrink-0 rounded-full border border-[#C9A84C] px-1.5 py-0.5 text-[10px] font-bold text-[#8A6E1E]">
                   REDIRECT
                 </span>
               )}

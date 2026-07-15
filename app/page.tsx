@@ -51,7 +51,6 @@ export default function Home() {
         if (error) setError("");
       }
     } catch (e) {
-      console.error(e);
       setError("Could not connect to the server");
     }
   };
@@ -76,7 +75,6 @@ export default function Home() {
             `/api/get_display_name?node=${encodeURIComponent(updated[i].name)}&foreNode=${encodeURIComponent(updated[i - 1].name)}`,
           );
           if (!res.ok) {
-            console.error(`fetch failed: ${res.status}`);
             updated[i] = { ...updated[i], displayName: updated[i].name };
             continue;
           }
@@ -86,7 +84,6 @@ export default function Home() {
             displayName: data.text ? data.text : updated[i].name,
           };
         } catch (e) {
-          console.error(e);
           updated[i] = { ...updated[i], displayName: updated[i].name };
         }
       }
@@ -103,219 +100,217 @@ export default function Home() {
   }, [path]);
 
   return (
-    <div className="min-h-screen bg-[#fafcff] text-slate-800 font-sans relative overflow-hidden selection:bg-indigo-200">
-      {/* --- おしゃれポイント1: アンビエント背景（ふわっと光る装飾） --- */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-indigo-300/20 blur-[120px]"></div>
-        <div className="absolute top-[60%] -right-[10%] w-[50%] h-[50%] rounded-full bg-cyan-300/20 blur-[120px]"></div>
-      </div>
+    <>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Caveat:wght@600;700&display=swap');`}</style>
 
-      <div className="max-w-3xl mx-auto px-4 py-10 sm:px-6 lg:py-16 relative z-10">
-        {/* ヘッダー */}
-        <header className="flex flex-col sm:flex-row justify-between items-center gap-6 mb-12">
-          <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-blue-500 to-cyan-400 drop-shadow-sm pb-1">
-            Wiki-Path-Finder
-          </h1>
-          <label className="cursor-pointer group inline-flex items-center justify-center px-6 py-2.5 bg-white/60 backdrop-blur-md border border-white/80 rounded-full text-sm font-bold text-slate-600 shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:bg-white hover:shadow-[0_4px_20px_rgb(0,0,0,0.06)] hover:text-indigo-600 transition-all active:scale-95">
-            {isColumn ? "✕ コラムを閉じる" : "✨ おまけコラム"}
-            <input
-              type="checkbox"
-              className="hidden"
-              checked={isColumn ?? false}
-              onChange={() => setIsColumn((prev) => !prev)}
-            />
-          </label>
+      <div
+        className="relative min-h-screen  text-[#EDE8D6]"
+        style={{
+          backgroundImage:
+            "repeating-linear-gradient(135deg, rgba(126,169,138,0.10) 0px, rgba(126,169,138,0.10) 48px, transparent 48px, transparent 96px)",
+        }}
+      >
+        {/* スタジアムの灯りのような、控えめな上部の光暈 */}
+        <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(126,169,138,0.16),transparent)]" />
+
+        <header className="sticky top-0 z-30 border-b border-[#3A5142]/60 bg-[#16241C]/90 backdrop-blur">
+          <div className="mx-auto flex max-w-3xl items-center justify-between px-5 py-4">
+            <h1
+              className="flex items-center gap-2 text-xl font-semibold tracking-tight text-[#F3EEDD] sm:text-2xl"
+              style={{ fontFamily: "'Oswald',sans-serif" }}
+            >
+              <span aria-hidden className="text-[#E1B84B]">
+                ⛳
+              </span>
+              Wiki-Path-Finder
+            </h1>
+
+            <label className="group flex cursor-pointer items-center gap-2 rounded-full border border-[#3A5142] bg-[#1E3328] px-4 py-1.5 text-xs text-[#CFE3D4] transition hover:border-[#E1B84B]/60 hover:text-[#F3EEDD] sm:text-sm">
+              {isColumn ? "コラムを閉じる" : "おまけコラム"}
+              <input
+                type="checkbox"
+                className="hidden"
+                checked={isColumn ?? false}
+                onChange={() => setIsColumn((prev) => !prev)}
+              />
+              <span
+                aria-hidden
+                className="text-xs text-[#E1B84B] transition group-hover:translate-x-0.5"
+              >
+                →
+              </span>
+            </label>
+          </div>
         </header>
 
         {!isColumn ? (
-          <main className="animate-in fade-in slide-in-from-bottom-8 duration-700 ease-out">
-            {/* 説明エリア: すりガラス風カード */}
-            <div
-              id="description"
-              className="bg-white/70 backdrop-blur-xl rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white mb-10 space-y-4"
-            >
-              <p className="text-slate-700 font-bold text-lg">
-                バキ童チャンネル発{" "}
-                <span className="text-indigo-600">「Wikipediaゴルフ」</span>{" "}
-                の最短経路探索ツール⛳️
+          <main className="mx-auto max-w-3xl px-5 pb-24 pt-10 sm:pt-16">
+            {/* リード文 */}
+            <section className="rounded-2xl border border-[#3A5142] bg-[#F3EEDD] p-6 text-[#1F3A2E] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] sm:p-8 mb-8 space-y-3 text-center sm:text-left">
+              <p className="text-sm text-[#9DBBA4]">
+                バキ童チャンネル発「Wikipediaゴルフ」の最短経路探索ツール
               </p>
-              <p className="text-slate-500 text-sm sm:text-base leading-relaxed">
+              <p className="text-base leading-relaxed text-[#7C6A3F] sm:text-lg">
                 スタートとゴールの記事名を入力すると、Wikipediaの膨大なリンクの網目から最短ルートを導き出します。
-                <br className="hidden sm:block" />
+              </p>
+              <p className="text-base leading-relaxed text-[#7C6A3F]">
                 思いもよらない記事同士の繋がりをお楽しみください。
               </p>
-              <div className="flex gap-4 mt-6 pt-5 border-t border-slate-200/60">
-                <span className="text-xs font-medium text-slate-400 bg-slate-100/50 px-3 py-1.5 rounded-full">
-                  🇯🇵 日本語版Wikipedia対象
+
+              <div className="flex flex-wrap justify-center gap-2 pt-1 sm:justify-start">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-[#3A5142] bg-[#1E3328] px-3 py-1 text-xs text-[#CFE3D4]">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#7FA98A]" />
+                  日本語版Wikipedia対象
                 </span>
-                <span className="text-xs font-medium text-slate-400 bg-slate-100/50 px-3 py-1.5 rounded-full">
-                  ※ DB一部削減あり
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-[#5C4A2A] bg-[#2A2418] px-3 py-1 text-xs text-[#E1B84B]">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#E1B84B]" />※
+                  DB一部削減あり
                 </span>
               </div>
-            </div>
+            </section>
 
-            {/* 入力フォームエリア */}
+            {/* スコアカード:入力フォーム */}
             <div
               id="inputForm"
-              className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-[0_12px_40px_rgb(0,0,0,0.06)] border border-white p-6 sm:p-10 mb-10 relative z-20"
+              className="rounded-2xl border border-[#3A5142] bg-[#F3EEDD] p-6 text-[#1F3A2E] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] sm:p-8"
             >
-              <FormProvider {...methods}>
-                <form
-                  onSubmit={methods.handleSubmit(onSubmit)}
-                  className="space-y-8"
-                >
-                  {/* スタート入力 */}
-                  <div className="space-y-3 relative z-30">
-                    <label className="text-sm font-extrabold text-slate-700 flex items-center gap-2 ml-1">
-                      <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.5)]"></div>
-                      START
-                    </label>
-                    <InputForm SG="start" />
-                  </div>
+              <p
+                className="mb-6 text-xs font-semibold tracking-[0.2em] text-[#7C6A3F]"
+                style={{ fontFamily: "'Oswald',sans-serif" }}
+              >
+                SCORECARD
+              </p>
 
-                  {/* 装飾: つなぎ目のラインとアイコン */}
-                  <div className="flex justify-center -my-5 relative z-10 pointer-events-none">
-                    <div className="w-[2px] h-12 bg-gradient-to-b from-emerald-200 to-rose-200 absolute top-1/2 -translate-y-1/2"></div>
-                    <div className="bg-white p-2.5 rounded-full shadow-md border border-slate-100 text-slate-300 relative z-10">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M12 5v14" />
-                        <path d="m19 12-7 7-7-7" />
-                      </svg>
+              <FormProvider {...methods}>
+                <form onSubmit={methods.handleSubmit(onSubmit)}>
+                  <div className="relative">
+                    {/* ホール間を結ぶ点線フェアウェイ */}
+                    <span
+                      aria-hidden
+                      className="absolute left-4 top-10 bottom-10 w-px border-l-2 border-dashed border-[#B9AE86]"
+                    />
+
+                    <div className="space-y-5">
+                      <label className="flex items-start gap-3">
+                        <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 border-[#1F3A2E] bg-[#F3EEDD] text-[10px] font-bold">
+                          S
+                        </span>
+                        <span className="flex-1">
+                          <span
+                            className="mb-1 block text-xs font-bold tracking-[0.15em] text-[#7C6A3F]"
+                            style={{ fontFamily: "'Oswald',sans-serif" }}
+                          >
+                            START
+                          </span>
+                          <InputForm SG="start" />
+                        </span>
+                      </label>
+
+                      <label className="flex items-start gap-3">
+                        <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 border-[#C0392B] bg-[#F3EEDD] text-[13px]">
+                          🚩
+                        </span>
+                        <span className="flex-1">
+                          <span
+                            className="mb-1 block text-xs font-bold tracking-[0.15em] text-[#7C6A3F]"
+                            style={{ fontFamily: "'Oswald',sans-serif" }}
+                          >
+                            GOAL
+                          </span>
+                          <InputForm SG="goal" />
+                        </span>
+                      </label>
                     </div>
                   </div>
 
-                  {/* ゴール入力 */}
-                  <div className="space-y-3 relative z-20">
-                    <label className="text-sm font-extrabold text-slate-700 flex items-center gap-2 ml-1">
-                      <div className="w-2.5 h-2.5 rounded-full bg-rose-400 shadow-[0_0_10px_rgba(251,113,133,0.5)]"></div>
-                      GOAL
-                    </label>
-                    <InputForm SG="goal" />
-                  </div>
-
-                  {/* ボタン */}
                   <button
                     type="submit"
                     onClick={() => setIsLoading(true)}
-                    className="w-full mt-4 bg-slate-900 hover:bg-indigo-600 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-300 shadow-[0_8px_20px_rgb(0,0,0,0.15)] hover:shadow-[0_8px_25px_rgba(79,70,229,0.3)] active:scale-[0.98] focus:outline-none focus:ring-4 focus:ring-indigo-500/20 flex justify-center items-center gap-3 group"
+                    className="mt-7 w-full rounded-xl bg-[#1F3A2E] py-3.5 text-sm font-bold tracking-wide text-[#F3EEDD] transition hover:bg-[#16241C] active:scale-[0.99] disabled:opacity-60"
                   >
-                    <span>経路を探索する</span>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="18"
-                      height="18"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="group-hover:translate-x-1 transition-transform"
-                    >
-                      <path d="M5 12h14" />
-                      <path d="m12 5 7 7-7 7" />
-                    </svg>
+                    経路を探索する ⛳
                   </button>
                 </form>
               </FormProvider>
             </div>
 
             {/* ローディング */}
-            <div id="Loading" className="h-8">
+            <div id="Loading" className="mt-6 flex justify-center">
               {isLoading && (
-                <div className="flex justify-center items-center gap-3 animate-pulse">
-                  <div className="flex gap-1">
-                    <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                    <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                    <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce"></div>
-                  </div>
-                  <p className="text-indigo-600 font-bold text-sm tracking-widest">
-                    SEARCHING...
-                  </p>
-                </div>
+                <p className="flex items-center gap-2 text-sm text-[#E1B84B]">
+                  <span className="flex gap-1">
+                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#E1B84B] [animation-delay:-0.2s]" />
+                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#E1B84B]" />
+                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#E1B84B] [animation-delay:0.2s]" />
+                  </span>
+                  SEARCHING...
+                </p>
               )}
             </div>
 
-            {/* 結果表示エリア */}
+            {/* 結果 */}
             <div id="result" className="mt-6">
               {error ? (
-                <div className="bg-rose-50/80 backdrop-blur-sm border border-rose-100 text-rose-600 px-6 py-5 rounded-2xl text-center font-bold shadow-sm">
+                <p className="rounded-xl border border-[#7A3B2E] bg-[#2A1B16] px-5 py-4 text-sm text-[#E8A98E]">
                   {ERROR_MESSAGES[error] ?? "予期せぬエラーが発生しました"}
-                </div>
+                </p>
               ) : (
                 path.length !== 0 && (
-                  <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-[0_12px_40px_rgb(0,0,0,0.06)] border border-white p-6 sm:p-10 animate-in zoom-in-95 duration-500">
-                    <div className="text-center mb-10">
-                      <p className="text-slate-400 font-bold text-sm tracking-widest mb-1">
-                        RESULT
-                      </p>
-                      <h2 className="text-3xl font-black text-slate-800">
-                        <span className="text-5xl text-transparent bg-clip-text bg-gradient-to-br from-indigo-500 to-cyan-400 pr-1">
-                          {path.length - 1}
-                        </span>{" "}
+                  <div className="rounded-2xl border border-[#3A5142] bg-[#F3EEDD] p-6 text-[#1F3A2E] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] sm:p-8">
+                    <div className="mb-6 flex items-baseline gap-3">
+                      <span
+                        className="text-5xl font-bold leading-none text-[#C0392B]"
+                        style={{ fontFamily: "'Caveat',cursive" }}
+                      >
+                        {path.length - 1}
+                      </span>
+                      <h2
+                        className="text-sm font-bold tracking-[0.15em] text-[#1F3A2E]"
+                        style={{ fontFamily: "'Oswald',sans-serif" }}
+                      >
                         打で到達
                       </h2>
                     </div>
 
-                    {/* おしゃれポイント2: 美しいタイムライン */}
-                    <div className="relative pl-2 sm:pl-4">
-                      {/* 美しいグラデーションの接続線 */}
-                      <div className="absolute left-[27px] sm:left-[35px] top-6 bottom-6 w-[3px] bg-gradient-to-b from-emerald-300 via-indigo-300 to-rose-300 rounded-full opacity-60 z-0"></div>
-
-                      {path.map((p, i) => (
-                        <div
-                          key={i}
-                          className="relative z-10 flex items-center gap-5 sm:gap-6 group mb-6 last:mb-0"
-                        >
-                          {/* ステップのノード（丸） */}
-                          <div
-                            className={`w-11 h-11 sm:w-12 sm:h-12 shrink-0 rounded-full flex items-center justify-center font-black text-sm sm:text-base shadow-md transition-all duration-300 border-4 border-white
-                            ${
-                              i === 0
-                                ? "bg-emerald-400 text-white shadow-emerald-400/30"
-                                : i === path.length - 1
-                                  ? "bg-rose-400 text-white shadow-rose-400/30"
-                                  : "bg-slate-100 text-slate-600 group-hover:bg-indigo-100 group-hover:text-indigo-600"
-                            }`}
-                          >
-                            {i + 1}
-                          </div>
-
-                          {/* 記事カード */}
-                          <div className="flex-1 bg-white border border-slate-100 rounded-2xl p-4 sm:p-5 shadow-sm group-hover:shadow-[0_8px_25px_rgb(0,0,0,0.06)] group-hover:-translate-y-0.5 transition-all duration-300">
-                            <span className="text-lg sm:text-xl font-bold text-slate-800 tracking-tight">
-                              {p.name}
+                    <ol className="relative pl-10">
+                      <span
+                        aria-hidden
+                        className="absolute left-4 top-4 bottom-4 w-px border-l-2 border-dashed border-[#B9AE86]"
+                      />
+                      {path.map((p, i) => {
+                        const isLast = i === path.length - 1;
+                        return (
+                          <li key={i} className="relative pb-6 last:pb-0">
+                            <span
+                              className={`absolute -left-10 flex h-8 w-8 items-center justify-center rounded-full border-2 text-[11px] font-bold ${
+                                isLast
+                                  ? "border-[#C0392B] bg-[#C0392B] text-[#F3EEDD]"
+                                  : "border-[#1F3A2E] bg-[#F3EEDD] text-[#1F3A2E]"
+                              }`}
+                            >
+                              {isLast ? "🚩" : i + 1}
                             </span>
-                            {p.displayName && (
-                              <span className="block sm:inline sm:ml-3 text-sm text-slate-400 font-medium mt-1 sm:mt-0">
-                                ({p.displayName})
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                            <p className="pt-1 text-sm font-medium leading-snug text-[#1F3A2E]">
+                              {p.name}
+                              {p.displayName && (
+                                <span className="ml-2 rounded-full bg-[#E7DFC2] px-2 py-0.5 text-[11px] font-normal text-[#7C6A3F]">
+                                  {p.displayName}
+                                </span>
+                              )}
+                            </p>
+                          </li>
+                        );
+                      })}
+                    </ol>
                   </div>
                 )
               )}
             </div>
           </main>
         ) : (
-          <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 ease-out">
-            <ColumnPage />
-          </div>
+          <ColumnPage />
         )}
       </div>
-    </div>
+    </>
   );
 }
