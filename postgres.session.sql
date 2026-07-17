@@ -1,3 +1,3 @@
-SELECT name
+SELECT *
 FROM nodes
-WHERE is_orphan = true;
+WHERE node_id = 270000

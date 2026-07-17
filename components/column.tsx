@@ -1,4 +1,5 @@
 import data from "@/content/data.json";
+import pruned_prompt from "@/content/pruned_plot.json";
 
 export default function ColumnPage() {
   const orphanAverage =
@@ -29,7 +30,7 @@ export default function ColumnPage() {
       {/* 統計スコアカード */}
       <div
         id="length"
-        className="space-y-6 rounded-2xl border border-[#3A5142] bg-[#F3EEDD] p-6 text-[#1F3A2E] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] sm:p-8"
+        className="space-y-6 rounded-2xl border border-[#3A5142] bg-[#F3EEDD] p-6 text-[#1F3A2E] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.2)] sm:p-8"
       >
         <div>
           <h3
@@ -174,12 +175,12 @@ export default function ColumnPage() {
 
       {/* リーダーボード */}
       <div id="ranking" className="mt-6 ">
-        <div className="rounded-2xl border border-[#3A5142] bg-[#F3EEDD] p-6 text-[#1F3A2E] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)]">
+        <div className="rounded-2xl border border-[#3A5142] bg-[#F3EEDD] p-6 text-[#1F3A2E] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.2)]">
           <h3
             className="mb-4 text-xs font-bold tracking-[0.2em] text-[#7C6A3F]"
             style={{ fontFamily: "'Oswald',sans-serif" }}
           >
-            最も多く「引用している」記事
+            最も多く「引用している」記事Top100
           </h3>
           <ul className="max-h-150 space-y-1 overflow-y-scroll pr-1">
             {data.ranking.quoting.map((q, i) => (
@@ -204,13 +205,12 @@ export default function ColumnPage() {
             ))}
           </ul>
         </div>
-
-        <div className="mt-6 rounded-2xl border border-[#3A5142] bg-[#F3EEDD] p-6 text-[#1F3A2E] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)]">
+        <div className="mt-6 rounded-2xl border border-[#3A5142] bg-[#F3EEDD] p-6 text-[#1F3A2E] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.2)]">
           <h3
             className="mb-4 text-xs font-bold tracking-[0.2em] text-[#7C6A3F]"
             style={{ fontFamily: "'Oswald',sans-serif" }}
           >
-            最も多く「引用されている」記事
+            最も多く「引用されている」記事Top100
           </h3>
           <ul className="max-h-150 space-y-1 overflow-y-scroll pr-1">
             {data.ranking.quoted.map((q, i) => (
@@ -235,6 +235,54 @@ export default function ColumnPage() {
             ))}
           </ul>
         </div>
+        <div className="mt-6 rounded-2xl border border-[#3A5142] bg-[#F3EEDD] p-6 text-[#1F3A2E] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.2)]">
+          <h3
+            className="mb-4 text-xs font-bold tracking-[0.2em] text-[#7C6A3F]"
+            style={{ fontFamily: "'Oswald',sans-serif" }}
+          >
+            最も多く「引用し」「引用されている」記事Top100
+          </h3>
+          <ul className="max-h-150 space-y-1 overflow-y-scroll pr-1">
+            {data.ranking.social.map((q, i) => (
+              <li
+                key={i}
+                className="flex items-center gap-3 rounded-lg px-2 py-2 transition hover:bg-[#E7DFC2]"
+              >
+                <span
+                  className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${
+                    i === 0
+                      ? "bg-[#C9A84C] text-[#1F3A2E]"
+                      : "border border-[#B9AE86] text-[#7C6A3F]"
+                  }`}
+                >
+                  {i + 1}
+                </span>
+                <span className="flex-1 truncate text-sm">{q.name}</span>
+                <span className="shrink-0 text-sm font-bold text-[#7C6A3F]">
+                  {q.cnt.toLocaleString()} 件
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+      <div
+        id="correlation"
+        className="mt-6 rounded-2xl border border-[#3A5142] bg-[#F3EEDD] p-6 mb-8 space-y-3 text-center sm:text-left shadow-[0_20px_50px_-20px_rgba(0,0,0,0.2)]"
+      >
+        <h3 className="text-[#9DBBA4]">最短経路を5万回調べて分かったこと</h3>
+        <p className="text-base leading-relaxed text-[#7C6A3F]">
+          pythonを用いてランダムな記事5万件の最短経路を求めました
+        </p>
+        <p className="text-base leading-relaxed text-[#7C6A3F]">
+          (パソコン君には頑張ってもらいました)
+        </p>
+        <p className="text-base leading-relaxed text-[#7C6A3F]">
+          さらに!!そのデータを利用して相関を求めました
+        </p>
+        <strong className="text-[#9DBBA4] text-xl">
+          最短経路出現回数と横のつながり(引用し引用される回数)の相関
+        </strong>
       </div>
     </main>
   );
