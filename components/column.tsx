@@ -55,7 +55,6 @@ export default function ColumnPage() {
   };
 
   const { slope, intercept } = linearRegression(plotData);
-  console.log(slope, intercept);
   const xs = plotData.map((d) => d.freq);
 
   const minX = Math.min(...xs);
@@ -352,32 +351,39 @@ export default function ColumnPage() {
         <strong className="text-[#9DBBA4] text-xl">
           最短経路出現回数と横のつながり(引用し引用される回数)の相関
         </strong>
-        <ResponsiveContainer width="100%" height={400}>
-          <ScatterChart>
+        <ResponsiveContainer width="100%" height={500}>
+          <ScatterChart
+            margin={{
+              top: 5,
+              right: 5,
+              bottom: 20,
+              left: 20,
+            }}
+          >
             <CartesianGrid />
             <XAxis
               type="number"
               dataKey="freq"
-              name="横のつながり数"
+              name="最短経路出現回数"
               scale="log"
               domain={["auto", "auto"]}
               label={{
                 value: "最短経路での出現回数",
                 position: "insideBottom",
-                offset: -5,
+                offset: -10,
               }}
             />
 
             <YAxis
               type="number"
               dataKey="quote"
-              name="最短経路出現回数"
+              name="横のつながり数"
               scale="log"
               domain={["auto", "auto"]}
               label={{
                 value: "横のつながりの数",
                 position: "insideLeft",
-                offset: -5,
+                offset: -10,
                 angle: -90,
               }}
             />
