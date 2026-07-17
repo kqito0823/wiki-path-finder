@@ -1,3 +1,4 @@
+"use client";
 import data from "@/content/data.json";
 import pruned_prompt from "@/content/pruned_plot.json";
 import {
@@ -8,7 +9,13 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  Line,
 } from "recharts";
+
+type plotData = {
+  freq: number;
+  quote: number;
+};
 
 export default function ColumnPage() {
   const orphanAverage =
@@ -21,7 +28,56 @@ export default function ColumnPage() {
   );
 
   const plotData = Object.values(pruned_prompt.data);
-  console.log(plotData);
+
+  const linearRegression = (plotData: plotData[]) => {
+    const n = plotData.length;
+
+    let sumX = 0;
+    let sumY = 0;
+    let sumXY = 0;
+    let sumXX = 0;
+
+    for (const p of plotData) {
+      const x = Math.log10(p.freq);
+      const y = Math.log10(p.quote);
+
+      sumX += x;
+      sumY += y;
+      sumXY += x * y;
+      sumXX += x * x;
+    }
+
+    // 傾きと切片を求める
+    const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+    const intercept = (sumY - slope * sumX) / n;
+
+    return { slope, intercept };
+  };
+
+  const { slope, intercept } = linearRegression(plotData);
+  console.log(slope, intercept);
+  const xs = plotData.map((d) => d.freq);
+
+  const minX = Math.min(...xs);
+  const maxX = Math.max(...xs);
+
+  const logMinX = Math.log10(minX);
+  const logMaxX = Math.log10(maxX);
+
+  const logMinY = slope * logMinX + intercept;
+  const logMaxY = slope * logMaxX + intercept;
+
+  const line = [
+    {
+      freq: minX,
+      quote: Math.pow(10, logMinY),
+    },
+    {
+      freq: maxX,
+      quote: Math.pow(10, logMaxY),
+    },
+  ];
+
   return (
     <main className="mx-auto max-w-3xl px-5 pb-24 pt-10 sm:pt-16">
       {/* 説明 */}
@@ -299,10 +355,33 @@ export default function ColumnPage() {
         <ResponsiveContainer width="100%" height={400}>
           <ScatterChart>
             <CartesianGrid />
-            <XAxis type="number" dataKey="freq" name="X" />
-            <YAxis type="number" dataKey="quote" name="Y" />
+            <XAxis
+              type="number"
+              dataKey="freq"
+              scale="log"
+              domain={["auto", "auto"]}
+              label={{
+                value: "最短経路での出現回数",
+                position: "insideBottom",
+                offset: -5,
+              }}
+            />
+
+            <YAxis
+              type="number"
+              dataKey="quote"
+              scale="log"
+              domain={["auto", "auto"]}
+              label={{
+                value: "横のつながりの数",
+                position: "insideLeft",
+                offset: -5,
+                angle: -90,
+              }}
+            />
             <Tooltip cursor={{ strokeDasharray: "3 3" }} />
             <Scatter data={plotData} />
+            <Line data={line} dataKey="quote" dot={false} />
           </ScatterChart>
         </ResponsiveContainer>
       </div>

@@ -14,16 +14,15 @@ with open("plot.json", encoding="utf-8") as f:
 with open("quote.json", encoding="utf-8") as f:
     quote = json.load(f)
 
-# ソート
-sorted_data = sorted(json_data["data"].items(), key=lambda x: x[1], reverse=True)
-print(sorted_data)
 
+list_data = [[k, v] for k, v in json_data["data"].items()]
 # 剪定
-step = max(1, round(len(sorted_data) / 1000))
 pruned_data = {}
-
-for i in range(0, len(sorted_data), step):
-    pruned_data[sorted_data[i][0]] = {"freq": sorted_data[i][1]}
+value_set = set()
+for ld in list_data:
+    if ld[1] not in value_set:
+        pruned_data[ld[0]] = {"freq": ld[1]}
+        value_set.add(ld[1])
 
 # quoteの追加
 for q in quote:
@@ -31,7 +30,6 @@ for q in quote:
     if key in pruned_data:
         pruned_data[key]["quote"] = int(q["cnt"])
 print(pruned_data)
-
 
 result = {
     "num_of_trial": json_data["num_of_trial"],

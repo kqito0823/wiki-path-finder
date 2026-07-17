@@ -207,7 +207,7 @@ export default function Home() {
                       </label>
 
                       <label className="flex items-start gap-3">
-                        <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 border-[#C0392B] bg-[#F3EEDD] text-[13px]">
+                        <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 border-[#C0392B] bg-[#F3EEDD] text-[13px] z-10">
                           🚩
                         </span>
                         <span className="flex-1">

@@ -6,7 +6,6 @@ from main import finder
 from pathlib import Path
 import json
 
-# 五万回行したタイム： 3:08:00
 load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL")
 conn = psycopg2.connect(DATABASE_URL)
@@ -24,7 +23,7 @@ def save():
 
 
 # 試行回数
-num_of_trial = 50_000
+num_of_trial = 100_000
 
 result = {
     "num_of_trial": {"total": num_of_trial, "over_7": 0},
