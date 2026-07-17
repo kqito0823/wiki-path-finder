@@ -358,6 +358,7 @@ export default function ColumnPage() {
             <XAxis
               type="number"
               dataKey="freq"
+              name="横のつながり数"
               scale="log"
               domain={["auto", "auto"]}
               label={{
@@ -370,6 +371,7 @@ export default function ColumnPage() {
             <YAxis
               type="number"
               dataKey="quote"
+              name="最短経路出現回数"
               scale="log"
               domain={["auto", "auto"]}
               label={{
