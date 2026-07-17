@@ -1,14 +1,27 @@
 import data from "@/content/data.json";
 import pruned_prompt from "@/content/pruned_plot.json";
+import {
+  ScatterChart,
+  Scatter,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 export default function ColumnPage() {
   const orphanAverage =
     Math.round(
       (data.length.nodes.orphan / data.length.nodes.available) * 1000,
     ) / 10;
+
   const linkAverage = Math.round(
     data.length.edges.total / data.length.nodes.total,
   );
+
+  const plotData = Object.values(pruned_prompt.data);
+  console.log(plotData);
   return (
     <main className="mx-auto max-w-3xl px-5 pb-24 pt-10 sm:pt-16">
       {/* 説明 */}
@@ -283,6 +296,15 @@ export default function ColumnPage() {
         <strong className="text-[#9DBBA4] text-xl">
           最短経路出現回数と横のつながり(引用し引用される回数)の相関
         </strong>
+        <ResponsiveContainer width="100%" height={400}>
+          <ScatterChart>
+            <CartesianGrid />
+            <XAxis type="number" dataKey="freq" name="X" />
+            <YAxis type="number" dataKey="quote" name="Y" />
+            <Tooltip cursor={{ strokeDasharray: "3 3" }} />
+            <Scatter data={plotData} />
+          </ScatterChart>
+        </ResponsiveContainer>
       </div>
     </main>
   );
