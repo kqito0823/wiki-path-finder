@@ -164,11 +164,11 @@ export default function Home() {
                 </span>
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-[#5C4A2A] bg-[#2A2418] px-3 py-1 text-xs text-[#E1B84B]">
                   <span className="h-1.5 w-1.5 rounded-full bg-[#E1B84B]" />※
-                  最短経路7打以上は強制終了になります
+                  DB一部削減あり
                 </span>
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-[#5C4A2A] bg-[#2A2418] px-3 py-1 text-xs text-[#E1B84B]">
                   <span className="h-1.5 w-1.5 rounded-full bg-[#E1B84B]" />※
-                  DB一部削減あり
+                  最短経路7打以上は強制終了になります
                 </span>
               </div>
             </section>

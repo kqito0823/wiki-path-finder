@@ -103,8 +103,8 @@ def get_path(s: str, g: str):
     if is_orphan:
         return {"error": "Goal node is Orphan"}
 
-    path = finder(start[0], goal)
+    path = finder(start[0], goal, cur)
     if path[0] == "7打以上のためエラー":
         return {"error": "path not exist"}
-    named_path = path_translater(path)
+    named_path = path_translater(path, cur)
     return {"path": named_path}
