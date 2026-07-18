@@ -340,17 +340,99 @@ export default function ColumnPage() {
       >
         <h3 className="text-[#9DBBA4]">最短経路を5万回調べて分かったこと</h3>
         <p className="text-base leading-relaxed text-[#7C6A3F]">
-          pythonを用いてランダムな記事5万件の最短経路を求めました
+          ランダムな記事<strong>5万件の最短経路</strong>
+          を求めました
         </p>
         <p className="text-base leading-relaxed text-[#7C6A3F]">
           (パソコン君には頑張ってもらいました)
         </p>
-        <p className="text-base leading-relaxed text-[#7C6A3F]">
-          さらに!!そのデータを利用して相関を求めました
-        </p>
-        <strong className="text-[#9DBBA4] text-xl">
+        <dl className="divide-y divide-dashed divide-[#D8CBA0] border-t border-[#D8CBA0] pt-6 text-[#1F3A2E]">
+          <div className="flex items-center justify-between py-3">
+            <dt className="text-sm font-medium text-[#1F3A2E]">
+              <span className="block text-sm font-medium text-[#1F3A2E]">
+                有効試行回数
+              </span>
+              <span className="block text-[11px] text-[#A99B6E]">
+                実行回数 - 7打以上
+              </span>
+            </dt>
+            <dd
+              className="text-2xl font-bold leading-none"
+              style={{ fontFamily: "'Caveat',cursive" }}
+            >
+              {(
+                pruned_prompt.num_of_trial.total -
+                pruned_prompt.num_of_trial.over_7
+              ).toLocaleString()}
+              <span
+                className="ml-1 text-xs font-normal text-[#7C6A3F]"
+                style={{ fontFamily: "'Oswald',sans-serif" }}
+              >
+                件
+              </span>
+            </dd>
+          </div>
+
+          <div className="flex items-center justify-between py-3">
+            <dt className="text-sm font-medium text-[#1F3A2E]">実行回数</dt>
+            <dd
+              className="text-2xl font-bold leading-none"
+              style={{ fontFamily: "'Caveat',cursive" }}
+            >
+              {pruned_prompt.num_of_trial.total.toLocaleString()}
+              <span
+                className="ml-1 text-xs font-normal text-[#7C6A3F]"
+                style={{ fontFamily: "'Oswald',sans-serif" }}
+              >
+                件
+              </span>
+            </dd>
+          </div>
+
+          <div className="flex items-center justify-between py-3">
+            <dt className="text-sm font-medium text-[#1F3A2E]">
+              最短経路が7打以上になったため、強制終了した回数
+            </dt>
+            <dd
+              className="text-2xl font-bold leading-none"
+              style={{ fontFamily: "'Caveat',cursive" }}
+            >
+              {pruned_prompt.num_of_trial.over_7.toLocaleString()}
+              <span
+                className="ml-1 text-xs font-normal text-[#7C6A3F]"
+                style={{ fontFamily: "'Oswald',sans-serif" }}
+              >
+                件
+              </span>
+            </dd>
+          </div>
+
+          <div className="flex items-center justify-between py-3">
+            <dt className="text-sm font-medium text-[#1F3A2E]">
+              最短経路の平均打数
+            </dt>
+            <dd
+              className="text-2xl font-bold leading-none"
+              style={{ fontFamily: "'Caveat',cursive" }}
+            >
+              {(pruned_prompt.quote.average + 1).toLocaleString()}
+              <span
+                className="ml-1 text-xs font-normal text-[#7C6A3F]"
+                style={{ fontFamily: "'Oswald',sans-serif" }}
+              >
+                打
+              </span>
+            </dd>
+          </div>
+        </dl>
+      </div>
+      <div
+        id="graph"
+        className="mt-6 rounded-2xl border border-[#3A5142] bg-[#F3EEDD] p-6 mb-8 space-y-3 text-center sm:text-left shadow-[0_20px_50px_-20px_rgba(0,0,0,0.2)]"
+      >
+        <h3 className="text-[#9DBBA4] text-xl">
           最短経路出現回数と横のつながり(引用し引用される回数)の相関
-        </strong>
+        </h3>
         <ResponsiveContainer width="100%" height={500}>
           <ScatterChart
             margin={{

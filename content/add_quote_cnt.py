@@ -16,13 +16,24 @@ with open("quote.json", encoding="utf-8") as f:
 
 
 list_data = [[k, v] for k, v in json_data["data"].items()]
+
 # 剪定
 pruned_data = {}
 value_set = set()
+total_quote = 0
 for ld in list_data:
+    total_quote += ld[1]
     if ld[1] not in value_set:
         pruned_data[ld[0]] = {"freq": ld[1]}
         value_set.add(ld[1])
+average_quote = (
+    round(
+        total_quote
+        / (json_data["num_of_trial"]["total"] - json_data["num_of_trial"]["over_7"])
+        * 100
+    )
+    / 100
+)
 
 # quoteの追加
 for q in quote:
@@ -33,6 +44,7 @@ print(pruned_data)
 
 result = {
     "num_of_trial": json_data["num_of_trial"],
+    "quote": {"total": total_quote, "average": average_quote},
     "data": pruned_data,
 }
 
