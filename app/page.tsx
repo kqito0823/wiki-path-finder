@@ -150,7 +150,7 @@ export default function Home() {
               <p className="text-sm text-[#9DBBA4]">
                 バキ童チャンネル発「Wikipediaゴルフ」の最短経路探索ツール
               </p>
-              <p className="text-base leading-relaxed text-[#7C6A3F] sm:text-lg">
+              <p className="text-base leading-relaxed text-[#7C6A3F]">
                 スタートとゴールの記事名を入力すると、Wikipediaの膨大なリンクの網目から最短ルートを導き出します。
               </p>
               <p className="text-base leading-relaxed text-[#7C6A3F]">
@@ -161,6 +161,10 @@ export default function Home() {
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-[#3A5142] bg-[#1E3328] px-3 py-1 text-xs text-[#CFE3D4]">
                   <span className="h-1.5 w-1.5 rounded-full bg-[#7FA98A]" />
                   日本語版Wikipedia対象
+                </span>
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-[#5C4A2A] bg-[#2A2418] px-3 py-1 text-xs text-[#E1B84B]">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#E1B84B]" />※
+                  最短経路7打以上は強制終了になります
                 </span>
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-[#5C4A2A] bg-[#2A2418] px-3 py-1 text-xs text-[#E1B84B]">
                   <span className="h-1.5 w-1.5 rounded-full bg-[#E1B84B]" />※
