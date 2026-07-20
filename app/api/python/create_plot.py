@@ -1,3 +1,7 @@
+# ------------------------------------------------------------------------------------------------------------
+#   create_data.pyの次にこのcreate_plot.pyを実行して下さい
+# ------------------------------------------------------------------------------------------------------------
+
 import psycopg2
 from dotenv import load_dotenv
 import os
@@ -5,6 +9,7 @@ import random
 from main import finder
 from pathlib import Path
 import json
+import time
 
 load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL")
@@ -23,20 +28,21 @@ def save():
 
 
 # 試行回数
-num_of_trial = 100_000
-
+trial = 50_000
+node_list = list(node)
 result = {
-    "num_of_trial": {"total": num_of_trial, "over_7": 0},
+    "trial": {"total": trial, "over_7": 0, "timer": 0},
     "data": {},
 }
-node_list = list(node)
+starts = random.sample(node_list, trial)
+goals = random.sample(node_list, trial)
 
-starts = random.sample(node_list, num_of_trial)
-goals = random.sample(node_list, num_of_trial)
+# タイマースタート
+time_start = time.perf_counter()
 for i, (s, g) in enumerate(zip(starts, goals), start=1):
     path = finder(s, g, cur)
     if path[0] == "7打以上のためエラー":
-        result["num_of_trial"]["over_7"] += 1
+        result["trial"]["over_7"] += 1
         continue
     for node_id in path[1:-1]:
         if node_id not in result["data"]:
@@ -49,5 +55,16 @@ for i, (s, g) in enumerate(zip(starts, goals), start=1):
         save()
 
 save()
+# タイマー終了
+time_end = time.perf_counter()
 cur.close()
 conn.close()
+
+result["trial"]["timer"] = time_end - time_start
+output_path = Path(__file__).resolve().parents[3] / "content" / "plot.json"
+with open(output_path, "w", encoding="utf-8") as f:
+    json.dump(result, f, ensure_ascii=False, indent=2)
+
+# ------------------------------------------------------------------------------------------------------------
+#   次にcontent/create_pruned_plot.py
+# ------------------------------------------------------------------------------------------------------------

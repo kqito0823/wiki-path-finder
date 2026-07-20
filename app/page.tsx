@@ -110,7 +110,6 @@ export default function Home() {
             "repeating-linear-gradient(135deg, rgba(126,169,138,0.10) 0px, rgba(126,169,138,0.10) 48px, transparent 48px, transparent 96px)",
         }}
       >
-        {/* スタジアムの灯りのような、控えめな上部の光暈 */}
         <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(126,169,138,0.16),transparent)]" />
 
         <header className="sticky top-0 z-30 border-b border-[#3A5142]/60 bg-[#16241C]/90 backdrop-blur">
@@ -173,7 +172,6 @@ export default function Home() {
               </div>
             </section>
 
-            {/* スコアカード:入力フォーム */}
             <div
               id="inputForm"
               className="rounded-2xl border border-[#3A5142] bg-[#F3EEDD] p-6 text-[#1F3A2E] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)] sm:p-8"
@@ -188,7 +186,6 @@ export default function Home() {
               <FormProvider {...methods}>
                 <form onSubmit={methods.handleSubmit(onSubmit)}>
                   <div className="relative">
-                    {/* ホール間を結ぶ点線フェアウェイ */}
                     <span
                       aria-hidden
                       className="absolute left-4 top-10 bottom-10 w-px border-l-2 border-dashed border-[#B9AE86]"
@@ -211,8 +208,8 @@ export default function Home() {
                       </label>
 
                       <label className="flex items-start gap-3">
-                        <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 border-[#C0392B] bg-[#F3EEDD] text-[13px] z-10">
-                          🚩
+                        <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 bg-[#F3EEDD] text-[10px] font-bold border-[#C0392B] z-1">
+                          G
                         </span>
                         <span className="flex-1">
                           <span
@@ -238,7 +235,6 @@ export default function Home() {
               </FormProvider>
             </div>
 
-            {/* ローディング */}
             <div id="Loading" className="mt-6 flex justify-center">
               {isLoading && (
                 <p className="flex items-center gap-2 text-sm text-[#E1B84B]">
@@ -252,7 +248,6 @@ export default function Home() {
               )}
             </div>
 
-            {/* 結果 */}
             <div id="result" className="mt-6">
               {error ? (
                 <p className="rounded-xl border border-[#7A3B2E] bg-[#2A1B16] px-5 py-4 text-sm text-[#E8A98E]">
@@ -292,7 +287,7 @@ export default function Home() {
                                   : "border-[#1F3A2E] bg-[#F3EEDD] text-[#1F3A2E]"
                               }`}
                             >
-                              {isLast ? "🚩" : i + 1}
+                              {i + 1}
                             </span>
                             <p className="pt-1 text-sm font-medium leading-snug text-[#1F3A2E]">
                               {p.name}

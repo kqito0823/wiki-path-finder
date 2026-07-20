@@ -28,6 +28,14 @@ export default function ColumnPage() {
   );
 
   const plotData = Object.values(pruned_prompt.data);
+  const trial = pruned_prompt.trial.total.toLocaleString();
+
+  const totalSeconds = Math.floor(pruned_prompt.trial.timer);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  const timeAverage =
+    Math.round((totalSeconds / pruned_prompt.trial.total) * 1000) / 1000;
 
   const linearRegression = (plotData: plotData[]) => {
     const n = plotData.length;
@@ -110,15 +118,22 @@ export default function ColumnPage() {
           <dl className="divide-y divide-dashed divide-[#D8CBA0]">
             <div className="flex items-center justify-between py-3">
               <dt className="text-sm font-medium text-[#1F3A2E]">総記事数</dt>
-              <dd
-                className="text-2xl font-bold leading-none"
-                style={{ fontFamily: "'Caveat',cursive" }}
-              >
-                {data.length.nodes.available.toLocaleString()}
+
+              <dd className="text-right">
                 <span
-                  className="ml-1 text-xs font-normal text-[#7C6A3F]"
-                  style={{ fontFamily: "'Oswald',sans-serif" }}
+                  className="block text-2xl font-bold leading-none"
+                  style={{ fontFamily: "'Caveat',cursive" }}
                 >
+                  {data.length.nodes.available.toLocaleString()}
+                  <span
+                    className="ml-1 text-xs font-normal text-[#7C6A3F]"
+                    style={{ fontFamily: "'Oswald',sans-serif" }}
+                  >
+                    件
+                  </span>
+                </span>
+                <span className="text-[11px] text-[#A99B6E]">
+                  ウェブ実装版は厳選した{data.length.web_nodes.toLocaleString()}
                   件
                 </span>
               </dd>
@@ -186,7 +201,9 @@ export default function ColumnPage() {
           </h3>
           <dl className="divide-y divide-dashed divide-[#D8CBA0]">
             <div className="flex items-center justify-between py-3">
-              <dt className="text-sm font-medium text-[#1F3A2E]">全記事合計</dt>
+              <dt className="text-sm font-medium text-[#1F3A2E]">
+                全リンク合計
+              </dt>
               <dd
                 className="text-2xl font-bold leading-none"
                 style={{ fontFamily: "'Caveat',cursive" }}
@@ -202,7 +219,9 @@ export default function ColumnPage() {
             </div>
 
             <div className="flex items-center justify-between py-3">
-              <dt className="text-sm font-medium text-[#1F3A2E]">一記事平均</dt>
+              <dt className="text-sm font-medium text-[#1F3A2E]">
+                一記事平均リンク個数
+              </dt>
               <dd
                 className="text-2xl font-bold leading-none"
                 style={{ fontFamily: "'Caveat',cursive" }}
@@ -297,7 +316,7 @@ export default function ColumnPage() {
                 </span>
                 <span className="flex-1 truncate text-sm">{q.name}</span>
                 <span className="shrink-0 text-sm font-bold text-[#7C6A3F]">
-                  {q.cnt.toLocaleString()} 件
+                  {q.cnt.toLocaleString()} 回
                 </span>
               </li>
             ))}
@@ -334,98 +353,222 @@ export default function ColumnPage() {
           </ul>
         </div>
       </div>
+
       <div
         id="correlation"
         className="mt-6 rounded-2xl border border-[#3A5142] bg-[#F3EEDD] p-6 mb-8 space-y-3 text-center sm:text-left shadow-[0_20px_50px_-20px_rgba(0,0,0,0.2)]"
       >
-        <h3 className="text-[#9DBBA4]">最短経路を5万回調べて分かったこと</h3>
+        <h3 className="text-[#9DBBA4]">
+          最短経路を{trial}回調べて分かったこと
+        </h3>
         <p className="text-base leading-relaxed text-[#7C6A3F]">
-          ランダムな記事<strong>5万件の最短経路</strong>
+          ランダムな記事<strong>{trial}件の最短経路</strong>
           を求めました
         </p>
         <p className="text-base leading-relaxed text-[#7C6A3F]">
           (パソコン君には頑張ってもらいました)
         </p>
-        <dl className="divide-y divide-dashed divide-[#D8CBA0] border-t border-[#D8CBA0] pt-6 text-[#1F3A2E]">
-          <div className="flex items-center justify-between py-3">
-            <dt className="text-sm font-medium text-[#1F3A2E]">
-              <span className="block text-sm font-medium text-[#1F3A2E]">
-                有効試行回数
-              </span>
-              <span className="block text-[11px] text-[#A99B6E]">
-                実行回数 - 7打以上
-              </span>
-            </dt>
-            <dd
-              className="text-2xl font-bold leading-none"
-              style={{ fontFamily: "'Caveat',cursive" }}
-            >
-              {(
-                pruned_prompt.num_of_trial.total -
-                pruned_prompt.num_of_trial.over_7
-              ).toLocaleString()}
-              <span
-                className="ml-1 text-xs font-normal text-[#7C6A3F]"
-                style={{ fontFamily: "'Oswald',sans-serif" }}
-              >
-                件
-              </span>
-            </dd>
-          </div>
-
-          <div className="flex items-center justify-between py-3">
-            <dt className="text-sm font-medium text-[#1F3A2E]">実行回数</dt>
-            <dd
-              className="text-2xl font-bold leading-none"
-              style={{ fontFamily: "'Caveat',cursive" }}
-            >
-              {pruned_prompt.num_of_trial.total.toLocaleString()}
-              <span
-                className="ml-1 text-xs font-normal text-[#7C6A3F]"
-                style={{ fontFamily: "'Oswald',sans-serif" }}
-              >
-                件
-              </span>
-            </dd>
-          </div>
-
-          <div className="flex items-center justify-between py-3">
-            <dt className="text-sm font-medium text-[#1F3A2E]">
-              最短経路が7打以上になったため、強制終了した回数
-            </dt>
-            <dd
-              className="text-2xl font-bold leading-none"
-              style={{ fontFamily: "'Caveat',cursive" }}
-            >
-              {pruned_prompt.num_of_trial.over_7.toLocaleString()}
-              <span
-                className="ml-1 text-xs font-normal text-[#7C6A3F]"
-                style={{ fontFamily: "'Oswald',sans-serif" }}
-              >
-                件
-              </span>
-            </dd>
-          </div>
-
-          <div className="flex items-center justify-between py-3">
-            <dt className="text-sm font-medium text-[#1F3A2E]">
-              最短経路の平均打数
-            </dt>
-            <dd
-              className="text-2xl font-bold leading-none"
-              style={{ fontFamily: "'Caveat',cursive" }}
-            >
-              {(pruned_prompt.quote.average + 1).toLocaleString()}
-              <span
-                className="ml-1 text-xs font-normal text-[#7C6A3F]"
-                style={{ fontFamily: "'Oswald',sans-serif" }}
-              >
-                打
-              </span>
-            </dd>
-          </div>
-        </dl>
       </div>
+
+      <div
+        id="correlation-data"
+        className="space-y-6 rounded-2xl border border-[#3A5142] bg-[#F3EEDD] p-6 text-[#1F3A2E] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.2)] sm:p-8"
+      >
+        <div>
+          <h3
+            className="mb-4 text-xs font-bold tracking-[0.2em] text-[#7C6A3F]"
+            style={{ fontFamily: "'Oswald',sans-serif" }}
+          >
+            実験について
+          </h3>
+          <dl className="divide-y divide-dashed divide-[#D8CBA0]">
+            <div className="flex items-center justify-between py-3">
+              <dt>
+                <span className="block text-sm font-medium text-[#1F3A2E]">
+                  有効試行回数
+                </span>
+                <span className="block text-[11px] text-[#A99B6E]">
+                  ※総試行回数 - 7回以上
+                </span>
+              </dt>
+              <dd
+                className="text-2xl font-bold leading-none"
+                style={{ fontFamily: "'Caveat',cursive" }}
+              >
+                {(
+                  pruned_prompt.trial.total - pruned_prompt.trial.over_7
+                ).toLocaleString()}
+                <span
+                  className="ml-1 text-xs font-normal text-[#7C6A3F]"
+                  style={{ fontFamily: "'Oswald',sans-serif" }}
+                >
+                  回
+                </span>
+              </dd>
+            </div>
+
+            <div className="flex items-center justify-between py-3">
+              <dt className="text-sm font-medium text-[#1F3A2E]">総試行回数</dt>
+              <dd
+                className="text-2xl font-bold leading-none"
+                style={{ fontFamily: "'Caveat',cursive" }}
+              >
+                {trial}
+                <span
+                  className="ml-1 text-xs font-normal text-[#7C6A3F]"
+                  style={{ fontFamily: "'Oswald',sans-serif" }}
+                >
+                  回
+                </span>
+              </dd>
+            </div>
+
+            <div className="flex items-center justify-between py-3">
+              <dt className="text-sm font-medium text-[#1F3A2E]">
+                最短経路が7回以上のためエラーになった回数
+              </dt>
+              <dd
+                className="text-2xl font-bold leading-none"
+                style={{ fontFamily: "'Caveat',cursive" }}
+              >
+                {pruned_prompt.trial.over_7.toLocaleString()}
+                <span
+                  className="ml-1 text-xs font-normal text-[#7C6A3F]"
+                  style={{ fontFamily: "'Oswald',sans-serif" }}
+                >
+                  回
+                </span>
+              </dd>
+            </div>
+          </dl>
+        </div>
+
+        <div className="border-t border-[#D8CBA0] pt-6">
+          <h3
+            className="mb-4 text-xs font-bold tracking-[0.2em] text-[#7C6A3F]"
+            style={{ fontFamily: "'Oswald',sans-serif" }}
+          >
+            {trial}回試行してわかったこと
+          </h3>
+          <dl className="divide-y divide-dashed divide-[#D8CBA0]">
+            <div className="flex items-center justify-between py-3">
+              <dt className="text-sm font-medium text-[#1F3A2E]">
+                最短経路に登場した記事種類
+              </dt>
+              <dd
+                className="text-2xl font-bold leading-none"
+                style={{ fontFamily: "'Caveat',cursive" }}
+              >
+                {pruned_prompt.quote.quote_data_length}
+                <span
+                  className="ml-1 text-xs font-normal text-[#7C6A3F]"
+                  style={{ fontFamily: "'Oswald',sans-serif" }}
+                >
+                  種
+                </span>
+              </dd>
+            </div>
+
+            <div className="flex items-center justify-between py-3">
+              <dt className="text-sm font-medium text-[#1F3A2E]">
+                最短経路の平均
+              </dt>
+              <dd
+                className="text-2xl font-bold leading-none"
+                style={{ fontFamily: "'Caveat',cursive" }}
+              >
+                {(pruned_prompt.quote.average + 1).toLocaleString()}
+                <span
+                  className="ml-1 text-xs font-normal text-[#7C6A3F]"
+                  style={{ fontFamily: "'Oswald',sans-serif" }}
+                >
+                  打
+                </span>
+              </dd>
+            </div>
+
+            <div className="flex items-center justify-between py-3">
+              <dt>
+                <span className="block text-sm font-medium text-[#1F3A2E]">
+                  「6次の隔たり」を応用した最短経路の平均打数予測
+                </span>
+                <span className="flex items-end gap-1 text-[11px] text-[#A99B6E]">
+                  <span className="font-medium">※log</span>
+                  <sub className="text-[8px] leading-none">平均リンク数</sub>
+                  総記事数
+                </span>
+              </dt>
+              <dd
+                className="text-2xl font-bold leading-none"
+                style={{ fontFamily: "'Caveat',cursive" }}
+              >
+                {pruned_prompt.quote.six_degrees}
+                <span
+                  className="ml-1 text-xs font-normal text-[#7C6A3F]"
+                  style={{ fontFamily: "'Oswald',sans-serif" }}
+                >
+                  打
+                </span>
+              </dd>
+            </div>
+
+            <div className="flex items-center justify-between py-3">
+              <dt>
+                <span className="block text-sm font-medium text-[#1F3A2E]">
+                  {trial}回実行するのにかかった時間
+                </span>
+                <span className="block text-[11px] text-[#A99B6E]">
+                  ※最短経路の計算に用いた時間のみ
+                </span>
+              </dt>
+              <dd
+                className="text-2xl font-bold leading-none"
+                style={{ fontFamily: "'Caveat',cursive" }}
+              >
+                {hours}
+                <span
+                  className="ml-1 text-xs font-normal text-[#7C6A3F]"
+                  style={{ fontFamily: "'Oswald',sans-serif" }}
+                >
+                  時間
+                </span>
+                {minutes}
+                <span
+                  className="ml-1 text-xs font-normal text-[#7C6A3F]"
+                  style={{ fontFamily: "'Oswald',sans-serif" }}
+                >
+                  分
+                </span>
+                {seconds}
+                <span
+                  className="ml-1 text-xs font-normal text-[#7C6A3F]"
+                  style={{ fontFamily: "'Oswald',sans-serif" }}
+                >
+                  秒
+                </span>
+              </dd>
+            </div>
+
+            <div className="flex items-center justify-between py-3">
+              <dt>最短経路計算時間平均</dt>
+              <dd
+                className="text-2xl font-bold leading-none"
+                style={{ fontFamily: "'Caveat',cursive" }}
+              >
+                {timeAverage}
+
+                <span
+                  className="ml-1 text-xs font-normal text-[#7C6A3F]"
+                  style={{ fontFamily: "'Oswald',sans-serif" }}
+                >
+                  秒
+                </span>
+              </dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+
       <div
         id="graph"
         className="mt-6 rounded-2xl border border-[#3A5142] bg-[#F3EEDD] p-6 mb-8 space-y-3 text-center sm:text-left shadow-[0_20px_50px_-20px_rgba(0,0,0,0.2)]"
